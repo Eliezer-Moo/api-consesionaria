@@ -20,3 +20,11 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::post('api/registro', 'App\Http\Controllers\UserController@register');
+Route::post('api/acceso','App\Http\Controllers\UserController@login');
+Route::resource('/api/carros','App\Http\Controllers\CarController');
