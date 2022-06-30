@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -83,7 +84,53 @@ class UserController extends Controller
     }
 
     public function register(Request $request){
-        echo 'Accion registro'; die();
+        //Recoger el post
+        $json = $request->input('json', null);
+        //Pemrite convertir a foramto de objeto lo que llegue
+        $params = json_decode($json);
+
+        $email = (!is_null($json) && isset($params->email)) ? $params->email : null;
+        $name = (!is_null($json) && isset($params->name)) ? $params->name : null;
+
+        $role =  'ROLE_USER';
+        $password =  (!is_null($json) && isset($params->password)) ? $params->password : null;
+        if(!is_null($email) && !is_null($password) && !is_null($name)){
+            //Crear el usuario
+            $user = new User();
+            $user->email=$email;
+            $user->name=$name;
+            $user->role = $role;
+            $pwd = hash('sha256', $password);
+            $user->password = $pwd;
+            //Comprobar usuario duplicado
+            $isset_user = User::where('email','=', $email)->get();
+            if(count($isset_user)==0){
+                //Guardar el usuario
+                $user->save();
+                $data = array(
+                    'status'=>'success',
+                    'codigo' => 200,
+                    'message'=>'Usuario Registrado correctamente'
+                );
+
+            }else{
+                //No guardarlo
+                $data = array(
+                    'status'=>'error',
+                    'codigo' => 400,
+                    'message'=>'Usuario Duplicado, no puede registrarse'
+                );
+            }
+            return response()->json($data, 200);
+
+        }else{
+            $data = array(
+                'status'=>'error',
+                'codigo' => 400,
+                'message'=>'Usuario no Creado'
+            );
+            return response()->json($data, 200);
+        }
     }
 
     public function login(Request $request){
