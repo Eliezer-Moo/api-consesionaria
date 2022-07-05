@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Helpers\JwtAuth;
 class CarController extends Controller
 {
     /**
@@ -11,9 +11,16 @@ class CarController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        echo 'index de carcontroller'; die();
+        $hash =  $request->header('Authorization', null);
+        $jwtAuth = new JwtAuth();
+        $checkToken = $jwtAuth->checkToken($hash);
+        if($checkToken){
+            echo "Index de CarController Autenticado"; die();
+        }else{
+            echo "Index de CarController No Autenticado"; die();
+        }
     }
 
     /**
